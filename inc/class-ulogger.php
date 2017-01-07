@@ -1,7 +1,7 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-include_once UniversalLogger::get_path() . 'class-ulog-level.php';
+include_once UniversalLogger::get_path() . 'inc/class-ulog-level.php';
 include_once UniversalLogger::get_path() . 'inc/interface-logger.php';
 
 /**

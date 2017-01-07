@@ -3,7 +3,7 @@ defined( 'WPINC' ) OR exit;
 
 /*
   Plugin Name: Universal Logger
-  Plugin URI: https://wordpress.org/plugins/universal-logger/
+  Plugin URI: https://github.com/thenadz/universal-logger
   Description: A general purpose logging plugin designed to be used by other plugins.
   Version: 1.0
   Author: Dan Rossiter
@@ -58,7 +58,7 @@ class UniversalLogger {
 include_once UniversalLogger::get_path() . 'inc/class-util.php';
 include_once UniversalLogger::get_path() . 'inc/class-setup.php';
 include_once UniversalLogger::get_path() . 'inc/class-registered-slug.php';
-include_once UniversalLogger::get_path() . 'class-ulogger.php';
+include_once UniversalLogger::get_path() . 'inc/class-ulogger.php';
 
 // register activation/uninstall hooks
 register_activation_hook( UniversalLogger::MainFile, array( 'UL_Setup', 'activate' ) );
