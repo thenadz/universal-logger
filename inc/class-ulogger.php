@@ -19,8 +19,8 @@ class ULogger {
 	 */
 	public static function init() {
 		// NOTE: May be filterable at later date.
-		include_once UniversalLogger::get_path() . 'inc/class-database.php';
-		self::$logger = new UL_Database();
+		include_once UniversalLogger::get_path() . 'inc/class-database-logger.php';
+		self::$logger = new UL_DatabaseLogger();
 		add_action( UniversalLogger::PurgeLogsAction, array( __CLASS__, 'purge_expired_entries' ) );
 	}
 

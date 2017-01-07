@@ -1,7 +1,7 @@
 <?php
 defined( 'WPINC' ) OR exit;
 
-class UL_Database implements UL_ILogger {
+class UL_DatabaseLogger implements UL_ILogger {
 
 	/**
 	 * @var UL_RegisteredSlug[][] The registered slugs and related metadata.
