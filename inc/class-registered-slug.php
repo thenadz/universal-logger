@@ -9,7 +9,7 @@ class UL_RegisteredSlug {
 	 * @param $purge_interval int The purge interval.
 	 * @param $log_level int The log level.
 	 */
-	public function __construct($id, $slug,$purge_interval,  $log_level) {
+	public function __construct( $id, $slug, $purge_interval,  $log_level ) {
 		$this->id = $id;
 		$this->slug = $slug;
 		$this->log_level = $log_level;

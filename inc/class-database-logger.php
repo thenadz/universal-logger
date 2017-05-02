@@ -31,8 +31,7 @@ class UL_DatabaseLogger implements UL_ILogger {
 			$results = $wpdb->get_results( "SELECT slug_id, slug, purge_interval, log_level FROM {$table_name}" );
 			$this->registered_slugs[$blog_id] = array();
 			foreach ( $results as $v ) {
-
-				$this->registered_slugs[$blog_id][$v->slug] = new UL_RegisteredSlug($v->slug_id, $v->slug, $v->purge_interval, $v->log_level);
+				$this->registered_slugs[$blog_id][$v->slug] = new UL_RegisteredSlug( $v->slug_id, $v->slug, $v->purge_interval, $v->log_level );
 			}
 		}
 
@@ -50,6 +49,9 @@ class UL_DatabaseLogger implements UL_ILogger {
 		return $this->_get_registered_slugs( $blog_id );
 	}
 
+	/**
+	 * Create schema for DB logger.
+	 */
 	public function create_schema() {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		global $wpdb;
@@ -108,7 +110,7 @@ KEY entry_time (entry_time)
 	 *
 	 * @return bool Indicates whether upsert was successful.
 	 */
-	public function upsert_slug( $slug_name, $purge_interval = 168, $log_level = ULogLevel::Warning, $blog_id = null ) {
+	public function upsert_slug( $slug_name, $purge_interval = UL_ILogger::PURGE_INTERVAL, $log_level = UL_ILogger::MIN_LOG_LEVEL, $blog_id = null ) {
 		global $wpdb;
 
 		if ( is_null( $blog_id ) ) {
@@ -161,13 +163,15 @@ KEY entry_time (entry_time)
 		}
 
 		$slugs = $this->_get_registered_slugs( $blog_id );
-
-		$table_name = $wpdb->get_blog_prefix( $blog_id ) . 'log_slug';
-		$vals = array( 'slug_id' => $slugs[$slug_name]->get_id() );
-		$fmts = '%d';
-		$ret = (bool)$wpdb->delete( $table_name, $vals, $fmts );
+		$ret = isset( $slugs[$slug_name] );
 		if ( $ret ) {
-			unset( $slugs[$slug_name] );
+			$table_name = $wpdb->get_blog_prefix( $blog_id ) . 'log_slug';
+			$vals = array( 'slug_id' => $slugs[$slug_name]->get_id() );
+			$fmts = '%d';
+			$ret = (bool)$wpdb->delete( $table_name, $vals, $fmts );
+			if ( $ret ) {
+				unset( $slugs[$slug_name] );
+			}
 		}
 
 		return $ret;
@@ -217,7 +221,7 @@ KEY entry_time (entry_time)
 	 * @return object[][] The entries, ordered oldest to newest. Each array has the following fields:
 	 *                  log_level, entry, entry_time, and entry_stacktrace
 	 */
-	public function get_entries( $slug_name, $min_ts = 0, $max_ts = self::TS_3000, $min_log_level = ULogLevel::Detail, $max_log_level = ULogLevel::Error, $blog_id = null ) {
+	public function get_entries( $slug_name, $min_ts = UL_ILogger::MIN_TIMESTAMP, $max_ts = UL_ILogger::MAX_TIMESTAMP, $min_log_level = UL_ILogger::MIN_LOG_LEVEL, $max_log_level = UL_ILogger::MAX_LOG_LEVEL, $blog_id = null ) {
 		global $wpdb;
 
 		if ( is_null( $blog_id ) ) {
@@ -237,7 +241,7 @@ WHERE slug_id = %d
 AND log_level BETWEEN %d AND %d
 AND entry_time BETWEEN %s AND %s
 ORDER BY entry_time ASC";
-		$ret = $wpdb->get_results( $wpdb->prepare( $sql, $slug_id, $min_log_level, $max_log_level, $min_time, $max_time ), ARRAY_A );
+		return $wpdb->get_results( $wpdb->prepare( $sql, $slug_id, $min_log_level, $max_log_level, $min_time, $max_time ), ARRAY_A );
 	}
 
 	/**
@@ -258,14 +262,5 @@ ORDER BY entry_time ASC";
 
 		$sql = "DELETE FROM {$prefix}log WHERE slug_id = %d AND entry_time < %s";
 		$wpdb->query( $wpdb->prepare( $sql, $slug_id, date( 'Y-m-d h:i:s', $ts ) ) );
-	}
-
-	/**
-	 * @param string $table_name Name of DB table to check existance of.
-	 *
-	 * @return bool Whether the table exists.
-	 */
-	private static function table_exists( $table_name ) {
-		return $table_name === $GLOBALS['wpdb']->get_var( "SHOW TABLES LIKE '{$table_name}'" );
 	}
 }

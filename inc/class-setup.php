@@ -28,21 +28,21 @@ class UL_Setup {
 	 * is already network activated.
 	 * See discussion: https://core.trac.wordpress.org/ticket/14170
 	 *
-	 * @param int $blog Blog ID.
+	 * @param int $blog_id Blog ID.
 	 */
-	public static function activate_new_blog( $blog ) {
+	public static function activate_new_blog( $blog_id ) {
 		if ( is_plugin_active_for_network( UniversalLogger::get_basename() ) ) {
-			self::_activate( $blog );
+			self::_activate( $blog_id );
 		}
 	}
 
 	/**
 	 * Runs activation setup for Universal Logger on all blog(s) it is activated on.
 	 *
-	 * @param int $blog Blog to update or null if updating current blog.
+	 * @param int $blog_id Blog to update or null if updating current blog.
 	 */
-	private static function _activate( $blog ) {
-		ULogger::upsert_slug( UniversalLogger::Slug );
+	private static function _activate( $blog_id ) {
+		ULogger::upsert_slug( UniversalLogger::Slug, UL_ILogger::PURGE_INTERVAL, UL_ILogger::MIN_LOG_LEVEL, $blog_id );
 	}
 
 	/**

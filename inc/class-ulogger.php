@@ -74,7 +74,7 @@ class ULogger {
 	 * @return object[][] The entries, ordered oldest to newest. Each array has the following fields:
 	 *                  log_level, entry, entry_time, and entry_stacktrace
 	 */
-	public static function get_entries( $slug_name, $min_ts = 0, $max_ts = UL_ILogger::TS_3000, $min_log_level = ULogLevel::Detail, $max_log_level = ULogLevel::Error, $blog_id = null ) {
+	public static function get_entries( $slug_name, $min_ts = UL_ILogger::MIN_TIMESTAMP, $max_ts = UL_ILogger::MAX_TIMESTAMP, $min_log_level = UL_ILogger::MIN_LOG_LEVEL, $max_log_level = UL_ILogger::MAX_LOG_LEVEL, $blog_id = null ) {
 		if ( $min_ts < 0 || $max_ts < $min_ts ) {
 			throw new InvalidArgumentException( "Invalid timestamp given." );
 		}
@@ -110,10 +110,11 @@ class ULogger {
 	 * @param $slug_name string The slug identifying who new entry belongs to.
 	 * @param int $purge_interval The interval at which log entries should be purged (in hours).
 	 * @param $log_level int The log level (should use ULogLevel consts).
+	 * @param $blog_id int The blog ID (default: current blog ID).
 	 *
 	 * @return bool Indicates whether upsert was successful.
 	 */
-	public static function upsert_slug( $slug_name, $purge_interval = 168, $log_level = ULogLevel::Warning, $blog_id = null ) {
+	public static function upsert_slug( $slug_name, $purge_interval = UL_ILogger::PURGE_INTERVAL, $log_level = UL_ILogger::MIN_LOG_LEVEL, $blog_id = null ) {
 		if ( ! ULogLevel::isValidValue( $log_level ) ) {
 			throw new InvalidArgumentException( "Invalid log level given." );
 		}

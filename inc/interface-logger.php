@@ -4,9 +4,29 @@ defined( 'WPINC' ) OR exit;
 interface UL_ILogger {
 
 	/**
-	 * @var int Unix timestamp for January 1, 3000. Just trust me.
+	 * @var int Default min timestamp if caller does not provide one.
+	 */
+	const MIN_TIMESTAMP = 0;
+
+	/**
+	 * @var int Default max timestamp if caller does not provide one.
 	 */
 	const MAX_TIMESTAMP = PHP_INT_MAX;
+
+	/**
+	 * @var int Default min log level if caller does not provide one.
+	 */
+	const MIN_LOG_LEVEL = ULogLevel::Warning;
+
+	/**
+	 * @var int Default max log level if caller does not provide one.
+	 */
+	const MAX_LOG_LEVEL = ULogLevel::Error;
+
+	/**
+	 * @var int The default purge interval in hrs. (24 * 7 = 168)
+	 */
+	const PURGE_INTERVAL = 168;
 
 	/**
 	 * @param $slug_name string The slug identifying who new entry belongs to.
@@ -33,7 +53,7 @@ interface UL_ILogger {
 	 *
 	 * @return bool Indicates whether upsert was successful.
 	 */
-	public function upsert_slug( $slug_name, $purge_interval = 168, $log_level = ULogLevel::Warning, $blog_id = null );
+	public function upsert_slug( $slug_name, $purge_interval = self::PURGE_INTERVAL, $log_level = self::MIN_LOG_LEVEL, $blog_id = null );
 
 	/**
 	 * @param $slug_name string The slug identifying who new entry belongs to.
@@ -65,7 +85,7 @@ interface UL_ILogger {
 	 * @return object[][] The entries, ordered oldest to newest. Each array has the following fields:
 	 *                  log_level, entry, entry_time, and entry_stacktrace
 	 */
-	public function get_entries( $slug_name, $min_ts = 0, $max_ts = self::MAX_TIMESTAMP, $min_log_level = ULogLevel::Detail, $max_log_level = ULogLevel::Error, $blog_id = null );
+	public function get_entries( $slug_name, $min_ts = self::MIN_TIMESTAMP, $max_ts = self::MAX_TIMESTAMP, $min_log_level = self::MIN_LOG_LEVEL, $max_log_level = self::MAX_LOG_LEVEL, $blog_id = null );
 
 	/**
 	 * @param $slug_name string The slug identifying which entries are being purged.

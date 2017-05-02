@@ -79,7 +79,7 @@ class ULogLevel {
 	public static function getValueByName( $name ) {
 		$levels = self::getLogLevels();
 
-		return array_key_exists( $name, self::getLogLevels() ) ? $levels[ $name ] : null;
+		return isset( $levels[ $name ] ) ? $levels[ $name ] : null;
 	}
 
 	/**
